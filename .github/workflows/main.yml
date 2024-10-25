@@ -1,3 +1,13 @@
+name: Build and Push Docker to AWS ECR
+
+on:
+  push:
+    branches:
+      - main  # Run the workflow on pushes to the main branch
+  pull_request:
+    branches:
+      - main
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -19,8 +29,14 @@ jobs:
       run: |
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 961341534133.dkr.ecr.us-east-1.amazonaws.com
 
-    - name: Build and Push Docker image
+    - name: Build Docker image
       run: |
         docker build -t myapp:latest .
+
+    - name: Tag Docker image
+      run: |
         docker tag myapp:latest 961341534133.dkr.ecr.us-east-1.amazonaws.com/myapp:latest
+
+    - name: Push Docker image to ECR
+      run: |
         docker push 961341534133.dkr.ecr.us-east-1.amazonaws.com/myapp:latest
